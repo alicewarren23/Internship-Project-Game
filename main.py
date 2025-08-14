@@ -2,13 +2,13 @@ import pygame
 import sys
 import os
 import random
-from branches import branch_stack  # Import dictionary from branches.py
+from branches import branch_stack  
 
 pygame.init()
 pygame.font.init()
 
-# Load background image
-bg_path = os.path.join(os.path.dirname(__file__), "Tube_Map.jpeg")
+#Loading Map#
+bg_path = os.path.join(os.path.dirname(__file__), "tube_tap.jpeg")
 if not os.path.exists(bg_path):
     print("Background image not found:", bg_path)
     sys.exit()
@@ -16,11 +16,11 @@ bg = pygame.image.load(bg_path)
 bg_rect = bg.get_rect()
 WIDTH, HEIGHT = bg_rect.size
 
-# Display setup
+#Display#
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Ball on Tube Map")
 
-# Load train image
+# Loading Train#
 train_img_path = os.path.join(os.path.dirname(__file__), "toy-train.png")
 if not os.path.exists(train_img_path):
     print("Train image not found:", train_img_path)
@@ -30,7 +30,7 @@ train_img = pygame.transform.scale(train_img, (50, 50))
 train_rect = train_img.get_rect()
 train_width, train_height = train_rect.size
 
-# Load confetti image
+#Confetti#
 confetti_img_path = os.path.join(os.path.dirname(__file__), "Confetti.png")
 if not os.path.exists(confetti_img_path):
     print("Confetti image not found:", confetti_img_path)

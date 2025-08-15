@@ -7,7 +7,7 @@ from branches import branch_stack
 pygame.init()
 pygame.font.init()
 
-#Loading Map#
+#Loading Map
 bg_path = os.path.join(os.path.dirname(__file__), "tube_tap.jpeg")
 if not os.path.exists(bg_path):
     print("Background image not found:", bg_path)
@@ -16,11 +16,11 @@ bg = pygame.image.load(bg_path)
 bg_rect = bg.get_rect()
 WIDTH, HEIGHT = bg_rect.size
 
-#Display#
+#Set Display 
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Ball on Tube Map")
 
-# Loading Train#
+#Loading Train
 train_img_path = os.path.join(os.path.dirname(__file__), "toy-train.png")
 if not os.path.exists(train_img_path):
     print("Train image not found:", train_img_path)
@@ -30,7 +30,7 @@ train_img = pygame.transform.scale(train_img, (50, 50))
 train_rect = train_img.get_rect()
 train_width, train_height = train_rect.size
 
-#Confetti#
+#Loading Confetti
 confetti_img_path = os.path.join(os.path.dirname(__file__), "Confetti.png")
 if not os.path.exists(confetti_img_path):
     print("Confetti image not found:", confetti_img_path)
@@ -38,7 +38,7 @@ if not os.path.exists(confetti_img_path):
 confetti_img = pygame.image.load(confetti_img_path)
 confetti_img = pygame.transform.scale(confetti_img, (200, 200))  # Made twice as big
 
-# Convert dict to lists
+# Convert branches dictionary to list
 path_names = list(branch_stack.keys())
 paths = list(branch_stack.values())
 
@@ -50,7 +50,7 @@ ball_x, ball_y = current_path[ball_pos_idx]
 
 clock = pygame.time.Clock()
 
-# Define your specific junctions with the paths they connect
+# Defining Junctions
 junctions = {
     (134, 242): [path_names.index("main_path"), path_names.index("old_data_street")],
     (351, 297): [path_names.index("main_path"), path_names.index("assumption_circus")],
@@ -65,7 +65,7 @@ for coord, path_indices in junctions.items():
     path_names_at_junction = [path_names[i] for i in path_indices]
     print(f"  {coord}: {path_names_at_junction}")
 
-# Path name → label
+#Labelling Paths
 name_to_label = {
     "main_path": "Continue",
     "old_data_street": "To Old Data Street",
@@ -82,6 +82,7 @@ btn_colors = [
     (0, 255, 255)
 ]
 
+#Defining pop-up window
 def show_popup(screen, options, current_path_name):
     popup_width, popup_height = 700, 250
     popup = pygame.Surface((popup_width, popup_height))
@@ -115,14 +116,14 @@ def show_popup(screen, options, current_path_name):
         pygame.draw.rect(popup, btn_color, (btn_x, btn_y, btn_width, btn_height))
         pygame.draw.rect(popup, (0, 0, 0), (btn_x, btn_y, btn_width, btn_height), 2)
         
-        # Add text to button
+        # Adding text to button
         btn_text = font.render(label, True, (255, 255, 255))
         text_rect = btn_text.get_rect(center=(btn_x + btn_width // 2, btn_y + btn_height // 2))
         popup.blit(btn_text, text_rect)
         
         buttons.append((btn_x, btn_x + btn_width, btn_y, btn_y + btn_height, path_idx))
 
-    # Center popup on screen
+    # Centre the pop-up
     popup_x = WIDTH // 2 - popup_width // 2
     popup_y = HEIGHT // 2 - popup_height // 2
     screen.blit(popup, (popup_x, popup_y))
@@ -145,11 +146,10 @@ def show_popup(screen, options, current_path_name):
     return choice
 
 def return_to_main_path():
-    """Find the nearest junction on main path and return there"""
     main_path_idx = path_names.index("main_path")
     main_path = paths[main_path_idx]
     
-    # Find all junction coordinates that are on the main path
+    #Location all junctions on main path
     main_junctions = []
     for junction_coord in junctions.keys():
         if junction_coord in main_path:
@@ -167,7 +167,7 @@ def return_to_main_path():
 
 branch_history = []
 
-# Add this new function after your other helper functions
+#Finds previous junction
 def find_previous_junction(current_path, current_pos_idx):
     """Find the last junction we passed on the current path"""
     # Look backwards through the path from current position
@@ -177,7 +177,7 @@ def find_previous_junction(current_path, current_pos_idx):
             return i, coord
     return 0, current_path[0]  # Return start if no junction found
 
-# Confetti class
+# Confetti-Code
 class Confetti:
     def __init__(self, x, y):
         self.x = x
@@ -187,6 +187,8 @@ class Confetti:
 
 confetti_particles = []
 showing_confetti = False
+
+# GAME LOOP!!!!!
 
 running = True
 while running:
@@ -207,7 +209,7 @@ while running:
             if (ball_x, ball_y) in junctions:
                 print(f"DEBUG: Found junction! Available paths: {[path_names[i] for i in junctions[(ball_x, ball_y)]]}")
             
-            # Check if current position is a junction
+            # Check if current position is already at a junction
             if (ball_x, ball_y) in junctions:
                 options = junctions[(ball_x, ball_y)]
                 current_path_name = name_to_label[path_names[current_path_idx]]
@@ -230,7 +232,7 @@ while running:
                         current_path_idx = choice
                         current_path = paths[current_path_idx]
                         
-                        # Find position on new path
+                        # Find first position on the branch path
                         if (ball_x, ball_y) in current_path:
                             ball_pos_idx = current_path.index((ball_x, ball_y))
                         else:
@@ -250,11 +252,11 @@ while running:
             
             print(f"Moved back to position ({ball_x}, {ball_y}) on {path_names[current_path_idx]}")
             
-            # Check if we've backtracked to a junction
+            # Check if train has backtracked to a junction
             if (ball_x, ball_y) in junctions:
                 options = junctions[(ball_x, ball_y)]
                 
-                # If we're on a branch path and the junction connects to main_path, offer to return
+                #Return to main path functionality
                 main_path_idx = path_names.index("main_path")
                 if current_path_idx != main_path_idx and main_path_idx in options:
                     print(f"*** JUNCTION DETECTED while backtracking at ({ball_x}, {ball_y}) ***")
@@ -271,7 +273,7 @@ while running:
                         current_path_idx = choice
                         current_path = paths[current_path_idx]
                         
-                        # Find position on new path (should be the same junction coordinate)
+                        # Find position on new path (same junction coordinate)
                         if (ball_x, ball_y) in current_path:
                             ball_pos_idx = current_path.index((ball_x, ball_y))
                         else:
@@ -296,7 +298,7 @@ while running:
             print(f"Returned to {path_names[current_path_idx]} at position {ball_pos_idx}")
         pygame.time.wait(200)
 
-    # NEW: SPACEBAR to return to main path
+    # Spacebar to return to main path
     if keys[pygame.K_SPACE]:
         # Find the previous junction on current path
         prev_junction_idx, prev_junction_coord = find_previous_junction(current_path, ball_pos_idx)
@@ -335,7 +337,7 @@ while running:
     # Check if train reached the target point
     if (ball_x, ball_y) == (835, 232) and not showing_confetti:
         showing_confetti = True
-        # Create new confetti particles
+        # Creating Confetti
         for _ in range(50):  # Reduced number of pieces since they're bigger
             confetti_particles.append(
                 Confetti(
